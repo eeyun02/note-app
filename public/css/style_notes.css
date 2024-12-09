@@ -1,0 +1,41 @@
+
+body{
+    /* background: linear-gradient(to right, #ff2acd, #ffcc00); */
+    background: linear-gradient(135deg,#cf9aff,#95c0ff);
+    
+}
+.container, .note, .note-content {
+    border: 1px solid #ccc;
+    margin: 10px 0;
+    padding: 10px;
+    /* background-color: white; */
+    background-color: rgba(255, 255, 255, 0.5);
+}
+.container{
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+    
+}
+.note-content {
+    min-height: 60px; /* Adjust height */
+}
+button {
+    margin-right: 10px;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #ff2acd;
+    color: white;
+}
+.logout-container {
+text-align: center; /* Center the contents */
+padding: 10px 10px; /* Add some padding at the top and bottom */
+
+}
+.logout-button {
+    display: center;
+    justify-content: center;
+    position: center;
+    cursor: pointer;
+    padding: 8px 15px;
+}
