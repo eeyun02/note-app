@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style_notes.css">
+    <title>Note Taking App</title>
+
+</head>
+<body>
+<div class="container">
+    <h1>Take a Note</h1>
+    <% if (messages.length > 0) { %>
+        <script type="text/javascript">
+            alert('<%= messages[0] %>'); // Displaying the first message as an alert
+        </script>
+    <% } %>
+    <div contenteditable="true" class="note-content"  >
+    </div>
+    <button onclick="createNote()">Create Note</button>
+    <div class="notes-container">
+        <% notes = notes || []; %>
+        <% notes.forEach(note => { %>
+            <div class="note">
+                <div contenteditable="true" class="note-content" data-id="<%= note.id %>">
+                    <%= note.contents.replace(/\[\[NEWLINE\]\]/g, '<br>') %>
+                    
+                </div>
+                <button onclick="updateNote(this)">Save</button>
+                <button onclick="deleteNote(<%= note.id %>)">Delete</button>
+            </div>
+        <% }); %>
+    </div>
+    <div class="logout-container">
+        <button onclick="window.location.href='/logout'" class="logout-button">Logout</button>
+    </div>
+</div>
+
+<script>
+    //show white page and notification when user try to back to note page after logout
+window.onpageshow = function(event) {
+    if (event.persisted) {
+        document.body.innerHTML = ''; // Clears the page content immediately
+        alert('You are logged out. Please log in again.');
+        window.location.href = '/login2'; // Optionally redirect to the login page after showing the alert
+    }
+};
+
+
+function checkSession() {
+    fetch('/check-session')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.isLoggedIn) {
+                document.body.innerHTML = ''; // Clears the current page content
+                alert('You are logged out. Please log in again.');
+                window.location.href = '/login2'; 
+            }
+        })
+        .catch(error => console.error('Error checking session status:', error));
+}
+setInterval(checkSession, 5000); // Check every 5 seconds
+
+setInterval(() => {
+    fetch('/session-active-check')
+    .then(response => response.json())
+    .then(data => {
+        if (!data.sessionActive) {
+            alert('Your session has expired. You will be redirected to the login page.');
+            window.location.href = '/login2';
+        }
+    })
+    .catch(error => console.error('Error checking session status:', error));
+}, 300000); // check every 5 minute
+
+
+    const userId = '<%= userId %>';
+    document.addEventListener('DOMContentLoaded', function() {
+    const notesContent = document.querySelectorAll('.note-content');
+    notesContent.forEach(function(note) {
+        //replace<br> for multiple line display
+        note.innerHTML = note.innerText.replace(/\n/g, '<br>');
+    });
+});
+
+function createNote() {
+    let content = document.querySelector('.container > .note-content').innerText;
+    content = content.replace(/\n/g, '[[NEWLINE]]'); // Convert newlines to a placeholder
+
+    // First, check the session status
+    fetch('/check-session')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.isLoggedIn) {
+                // If not logged in, alert the user and redirect
+                alert('Your session has expired. Please log in again.');
+                window.location.href = '/login2';
+            } else {
+                // If logged in, proceed with creating the note
+                return fetch(`/create-note/${userId}`, { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
+                    body: `noteContent=${encodeURIComponent(content)}`
+                });
+            }
+        })
+        .then(() => {
+            if (window.location.href.includes('/notes2')) {
+                window.location.reload(); // Reload only if we are still on the notes page
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+
+
+// function createNote() {
+//     let content = document.querySelector('.container > .note-content').innerText;
+//     content = content.replace(/\n/g, '[[NEWLINE]]'); // Convert newlines to a placeholder
+//     fetch(`/create-note/${userId}`, { 
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
+//         body: `noteContent=${encodeURIComponent(content)}`
+//     }).then(() => window.location.reload());
+// }
+function updateNote(button) {
+    let noteDiv = button.previousElementSibling;
+    let content = noteDiv.innerText;
+    content = content.replace(/\n/g, '[[NEWLINE]]'); // Convert newlines to a placeholder
+    let noteId = noteDiv.getAttribute('data-id');
+    fetch(`/update-note/${noteId}`, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', },
+        body: `noteContent=${encodeURIComponent(content)}`
+    }).then(() => window.location.reload());
+}
+function deleteNote(id) {
+    fetch(`/delete-note/${id}`, { 
+        method: 'POST'
+    }).then(() => window.location.reload());
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html><head>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="css/style_login_signup.css">
+    <script src="https://kit.fontawesome.com/113ff0c45b.js" crossorigin="anonymous"></script>
+
+</head><body>
+    
+<div class="container">
+    <div class="form-box">
+        
+        <form class="form-group" action="/login2" id="login" method="post" autocomplete="off">
+            <h1 id="title">Login</h1>
+            <% if(errors && errors.length > 0) { %>
+                <div name="message" class="message message-error" style="color: red;"><%= errors[0].msg %></div>
+            <% } %>
+            <div class="input-group">
+
+                <% if (messages.notification) { %>
+                    <script type="text/javascript">
+                            alert('<%= messages.notification %>');
+                    </script>
+                    <% } %>
+                <div class="input-field"  id="usernameField">
+                    <i class="fa-regular fa-user"></i>
+                    <input type="text" name="username" placeholder="Username" autocomplete="off">
+                    
+                </div>
+                <div class="input-field"  id="passwordField">
+                    <span class="prefix"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" name="password" placeholder="Password" class="pass" autocomplete="off" >
+                    <span class="suffix"><i class="fa-regular fa-eye"></i></span>
+                </div>
+                
+            </div>
+            <div class="btn-field">
+                <button type="submit" id="loginbtn">Login</button>
+            </div>
+            <p> <a class="form-link" id="signuplink" href="/signup">New User?</a></p>
+        </form>
+        
+    </div>
+</div>
+<script>
+    //when page reload from back in browser
+    window.onpageshow = function(event) {
+    if (event.persisted) {
+        window.location.reload();  
+    }
+    document.getElementById('login').reset(); 
+};
+    window.onload = function() {
+    document.getElementsByName('username')[0].value = '';
+    document.getElementsByName('password')[0].value = '';
+    
+}
+    const btn = document.querySelector('.fa-eye');
+const passwordE1 = document.querySelector(".pass");btn.addEventListener("click",()=>{
+    if(passwordE1.type === "password"){
+        passwordE1.type = "text";
+        btn.classList.replace("fa-eye","fa-eye-slash");
+    }
+    else{
+        passwordE1.type="password";
+        btn.classList.replace("fa-eye-slash","fa-eye");
+    }
+})
+
+
+</script>
+
+
+</body></html>
